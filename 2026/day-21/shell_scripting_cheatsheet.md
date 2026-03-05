@@ -1,57 +1,90 @@
-Shell Scripting Cheat Sheet
+# Shell Scripting Cheat Sheet
 
-Quick Reference Table
+## Quick Reference Table
 
-Topic	Key Syntax	Example
-Shebang	#!/bin/bash	#!/bin/bash
-Variable	VAR="value"	NAME="DevOps"
-Argument	$1, $2	./script.sh arg1
-If	if [ condition ]; then	if [ -f file ]; then
-For loop	for i in list; do	for i in 1 2 3; do
-Function	name() { ... }	greet() { echo "Hi"; }
-Grep	grep pattern file	grep -i "error" log.txt
-Awk	awk '{print $1}' file	awk -F: '{print $1}' /etc/passwd
-Sed	sed 's/old/new/g' file	sed -i 's/foo/bar/g' config.txt
-Cut	cut -d',' -f1 file	cut -d: -f1 /etc/passwd
-Sort	sort -n -r file	sort -k2 -t: file
-Uniq	uniq -c	sort file | uniq -c
-Find	find path -name pattern	find . -name "*.log" -mtime +7 -delete
-Exit code	$?	if [ $? -eq 0 ]; then
+| Topic               | Key Syntax                       | Example                                           |
+| ------------------- | -------------------------------- | ------------------------------------------------- |
+| Make Executable     | `chmod +x file.sh`               | `chmod +x script.sh`                              |
+| Run Script          | `./file.sh`                      | `./script.sh`                                     |
+| Comment             | `# comment`                      | `echo "Hi" # inline comment`                      |
+| Variable            | `VAR="value"`                    | `NAME="DevOps"`                                   |
+| Use Variable        | `$VAR`                           | `echo $NAME`                                      |
+| Read Input          | `read VAR`                       | `read USER`                                       |
+| Arguments           | `$1 $2 $# $@ $?`                 | `./script.sh arg1`                                |
+| String Compare      | `[ "$a" = "$b" ]`                | `[ "$name" = "Linux" ]`                           |
+| Integer Compare     | `[ $a -gt 10 ]`                  | `[ $num -eq 5 ]`                                  |
+| File Test           | `[ -f file ]`                    | `[ -d /home ]`                                    |
+| If Condition        | `if [ cond ]; then`              | `if [ -f file ]; then echo OK; fi`                |
+| Case Statement      | `case $v in ... esac`            | `case $1 in start) echo run ;; esac`              |
+| AND                 | `cmd1 && cmd2`                   | `mkdir test && cd test`                           |
+| OR                  | `cmd1 \|\| cmd2`                 | `cd dir \|\| pwd`                                 |
+| For Loop            | `for i in list; do`              | `for i in 1 2 3; do echo $i; done`                |
+| C-Style For         | `for ((i=1;i<=3;i++))`           | `for ((i=1;i<=3;i++)); do touch f$i; done`        |
+| While Loop          | `while [ cond ]; do`             | `while [ $a -lt 5 ]; do echo $a; done`            |
+| Until Loop          | `until [ cond ]; do`             | `until ping -c1 google.com; do sleep 2; done`     |
+| Break               | `break`                          | `if [ $i -eq 5 ]; then break; fi`                 |
+| Continue            | `continue`                       | `if [ $i -eq 2 ]; then continue; fi`              |
+| Function            | `name() { ... }`                 | `greet(){ echo "Hi"; }`                           |
+| Function Arg        | `$1 inside function`             | `add(){ echo $(($1+$2)); }`                       |
+| Return Status       | `return 0`                       | `return 1`                                        |
+| Capture Output      | `result=$(func)`                 | `val=$(date)`                                     |
+| Local Variable      | `local var=value`                | `local count=10`                                  |
+| grep                | `grep pattern file`              | `grep -i "error" log.txt`                         |
+| awk                 | `awk '{print $1}' file`          | `awk -F: '{print $1}' /etc/passwd`                |
+| sed                 | `sed 's/a/b/g' file`             | `sed -i 's/foo/bar/g' file.txt`                   |
+| cut                 | `cut -d: -f1 file`               | `cut -d: -f1 /etc/passwd`                         |
+| sort                | `sort file`                      | `sort -n numbers.txt`                             |
+| uniq                | `sort file \| uniq`              | `sort file \| uniq -c`                            |
+| tr                  | `tr 'a-z' 'A-Z'`                 | `echo hi \| tr 'a-z' 'A-Z'`                       |
+| wc                  | `wc -l file`                     | `wc -w file.txt`                                  |
+| head                | `head -n 5 file`                 | `head -n 10 log.txt`                              |
+| tail                | `tail -f file`                   | `tail -f app.log`                                 |
 
-1. Basics
-Shebang
-#!/bin/bash – Specifies the interpreter to execute the script. Must be the first line.
+---
 
+## 1. Basics
+
+### Shebang (`#!/bin/bash`)
+- **What it does**: Tells the system to use `/bin/bash` interpreter to execute the script.
+- **Why it matters**: Without it, the script runs with the default shell, which may cause compatibility issues.
+- **Example**:
+  ```bash
+  #!/bin/bash
+  echo "Hello, world!"
 Running a script
-chmod +x script.sh – Make script executable.
+chmod +x script.sh – Make the script executable.
 
-./script.sh – Execute script (requires execute permission).
+./script.sh – Run the script (uses shebang).
 
-bash script.sh – Run script with bash interpreter (ignore shebang).
+bash script.sh – Run the script explicitly with Bash (ignores shebang).
 
 Comments
-Single line – # This is a comment
+Single line: # This is a comment
 
-Inline – command # comment after command
+Inline: echo "Hello" # prints Hello
+
+Comments are ignored by the shell but essential for code readability.
 
 Variables
-Declaring – NAME="John" (no spaces around =)
+Declaring: NAME="John" (no spaces around =).
 
-Using – $NAME or ${NAME}
+Using: $NAME or ${NAME}.
 
 Quoting:
 
-"$VAR" – Expands variable, preserves spaces.
+Double quotes: "Hello $NAME" → expands variable.
 
-'$VAR' – Literal string, no expansion.
+Single quotes: 'Hello $NAME' → literal string.
 
 Reading user input
-read – Read input into variable.
+read – Reads input into a variable.
+
+Example:
 
 bash
 echo "Enter your name:"
 read NAME
-echo "Hello $NAME"
+echo "Hello $NAME!"
 Command-line arguments
 $0 – Script name.
 
@@ -63,30 +96,41 @@ $@ – All arguments as separate words.
 
 $? – Exit status of last command.
 
+Example:
+
+bash
+#!/bin/bash
+echo "Script: $0"
+echo "First arg: $1"
+echo "Total args: $#"
+echo "All args: $@"
+
+ls /nonexistent
+echo "Exit status: $?"   # non-zero indicates failure
 2. Operators and Conditionals
 String comparisons
 Operator	Meaning	Example
 =	Equal	[ "$a" = "$b" ]
 !=	Not equal	[ "$a" != "$b" ]
--z	String is empty (zero length)	[ -z "$a" ]
--n	String is not empty	[ -n "$a" ]
+-z	Zero length (empty)	[ -z "$str" ]
+-n	Non-zero length	[ -n "$str" ]
 Integer comparisons
 Operator	Meaning	Example
 -eq	Equal	[ $a -eq $b ]
 -ne	Not equal	[ $a -ne $b ]
 -lt	Less than	[ $a -lt $b ]
 -gt	Greater than	[ $a -gt $b ]
--le	Less than or equal	[ $a -le $b ]
--ge	Greater than or equal	[ $a -ge $b ]
+-le	Less or equal	[ $a -le $b ]
+-ge	Greater or equal	[ $a -ge $b ]
 File test operators
 Operator	Meaning	Example
--f	File exists and is regular	[ -f file ]
+-f	Regular file exists	[ -f file ]
 -d	Directory exists	[ -d dir ]
 -e	File/directory exists	[ -e path ]
 -r	Readable	[ -r file ]
 -w	Writable	[ -w file ]
 -x	Executable	[ -x file ]
--s	File exists and not empty	[ -s file ]
+-s	Non-empty file	[ -s file ]
 if, elif, else syntax
 bash
 if [ condition ]; then
@@ -97,21 +141,21 @@ else
   # commands
 fi
 Logical operators
-&& – AND: [ condition1 ] && [ condition2 ]
+&& – AND: [ cond1 ] && [ cond2 ]
 
-|| – OR: [ condition1 ] || [ condition2 ]
+|| – OR: [ cond1 ] || [ cond2 ]
 
-! – NOT: [ ! condition ]
+! – NOT: ! [ cond ]
 
 Case statements
 bash
 case $VAR in
   pattern1)
-    commands;;
+    commands ;;
   pattern2|pattern3)
-    commands;;
+    commands ;;
   *)
-    default commands;;
+    default commands ;;
 esac
 3. Loops
 for loop (list-based)
@@ -139,7 +183,7 @@ until [ $count -gt 5 ]; do
   ((count++))
 done
 Loop control
-break – Exit loop.
+break – Exit the loop.
 
 continue – Skip to next iteration.
 
@@ -150,8 +194,8 @@ for file in *.log; do
 done
 Looping over command output (while read)
 bash
-cat file.txt | while read line; do
-  echo $line
+ls *.txt | while read line; do
+  echo "File: $line"
 done
 4. Functions
 Defining a function
@@ -162,109 +206,125 @@ function_name() {
 Calling a function
 bash
 function_name
-Passing arguments
-Inside function: $1, $2, $@ refer to function arguments, not script arguments.
+Passing arguments to functions
+Inside the function, $1, $2, etc. refer to function arguments.
 
 bash
 greet() {
-  echo "Hello $1"
+  echo "Hello, $1"
 }
 greet "World"
 Return values
-return – Exit function with exit status (0-255).
+return – Returns an exit status (0–255). Capture with $?.
 
-echo – Output data to be captured.
+echo – Outputs data that can be captured with command substitution.
+
+Example:
 
 bash
-get_name() {
-  echo "John"
+# Using return for status
+check_file() {
+  if [ -f "$1" ]; then
+    return 0
+  else
+    return 1
+  fi
 }
-NAME=$(get_name)
+check_file "/etc/passwd" && echo "Exists"
+
+# Using echo for value
+get_date() {
+  echo "$(date +%Y-%m-%d)"
+}
+today=$(get_date)
 Local variables
-local – Declare variable local to function.
+local – Declare a variable local to the function.
+
+Example:
 
 bash
 myfunc() {
-  local VAR="local"
-  echo $VAR
+  local count=5
+  echo "Inside: $count"
 }
+myfunc
+echo "Outside: $count"   # empty
 5. Text Processing Commands
 grep – search patterns
 bash
-grep "pattern" file               # basic search
-grep -i "error" log.txt           # case-insensitive
+grep -i "error" log.txt          # case-insensitive
 grep -r "TODO" .                  # recursive
-grep -c "error" log.txt           # count matches
-grep -n "error" log.txt           # show line numbers
-grep -v "exclude" file            # invert match
-grep -E "err|warn" log.txt        # extended regex (or)
+grep -c "failed" auth.log         # count matches
+grep -n "sshd" /etc/ssh/sshd_config  # show line numbers
+grep -v "INFO" syslog              # invert match
+grep -E "error|warn" log.txt       # extended regex
 awk – column-based processing
 bash
-awk '{print $1}' file             # print first column
-awk -F: '{print $1}' /etc/passwd  # field separator :
-awk '$2 > 100 {print $1}' file    # condition on column 2
+awk '{print $1}' file              # print first column
+awk -F: '{print $1, $3}' /etc/passwd   # delimiter :
+awk '/root/ {print $1}' file        # pattern match
 awk 'BEGIN{print "Start"} {print} END{print "End"}' file
 sed – stream editor
 bash
-sed 's/old/new/g' file            # substitute all occurrences
-sed -i 's/old/new/g' file         # in-place edit
-sed '/pattern/d' file              # delete lines matching pattern
-sed '5d' file                      # delete line 5
-sed -n '10,20p' file               # print lines 10-20
-cut – extract columns
+sed 's/old/new/g' file             # substitute all occurrences
+sed -i 's/old/new/g' file          # in-place edit
+sed '/pattern/d' file               # delete matching lines
+sed '2d' file                       # delete line 2
+sed -n '10,20p' file                # print lines 10-20
+cut – extract columns by delimiter
 bash
-cut -d',' -f1,3 file.csv          # delimiter , fields 1 and 3
-cut -c1-10 file                    # characters 1-10
 cut -d: -f1 /etc/passwd            # first field using :
+cut -d',' -f2,4 data.csv           # fields 2 and 4
+cut -c1-10 file                     # first 10 characters
 sort – sort lines
 bash
 sort file                          # alphabetical
 sort -n file                       # numerical
 sort -r file                       # reverse
-sort -u file                       # unique (like uniq)
+sort -u file                       # unique (same as uniq)
 sort -k2 -t: file                  # sort by field 2 with delimiter :
-uniq – unique lines (requires sorted input)
+uniq – deduplicate lines (input must be sorted)
 bash
-uniq file                          # remove consecutive duplicates
 sort file | uniq                   # global unique
 sort file | uniq -c                # count occurrences
+uniq -u file                       # show only unique lines
 tr – translate/delete characters
 bash
-tr '[:lower:]' '[:upper:]' < file  # uppercase
-tr -d ',' < file                    # delete commas
+echo "hello" | tr 'a-z' 'A-Z'      # uppercase
+echo "hello 123" | tr -d '0-9'     # delete digits
 tr -s ' ' < file                    # squeeze spaces
-wc – word/line/character count
+wc – line/word/char count
 bash
-wc -l file                          # line count
-wc -w file                          # word count
-wc -c file                          # byte count
+wc -l file                         # line count
+wc -w file                         # word count
+wc -c file                         # character count
 head / tail – first/last lines
 bash
-head -n 10 file                     # first 10 lines
-tail -n 20 file                     # last 20 lines
-tail -f log.txt                     # follow file (live)
+head -n 5 file                     # first 5 lines
+tail -n 20 file                    # last 20 lines
+tail -f log.txt                    # follow live updates
 6. Useful Patterns and One-Liners
 Find and delete files older than N days
 bash
-find /path -type f -name "*.log" -mtime +7 -delete
+find /var/log -type f -name "*.log" -mtime +15 -delete
 Count lines in all .log files
 bash
-wc -l *.log | tail -1               # total lines
+wc -l /var/log/*.log | tail -1
 Replace a string across multiple files
 bash
-sed -i 's/old/new/g' *.txt
+sed -i 's/db.oldserver.com/db.newserver.com/g' /etc/myapp/*.conf
 Check if a service is running
 bash
-systemctl is-active --quiet service && echo "Running" || echo "Stopped"
+systemctl is-active --quiet nginx && echo "Running" || echo "Stopped"
 Monitor disk usage with alert
 bash
-df -h | awk '$5+0 > 80 {print "Alert: " $6 " is " $5 " full"}'
+df -h | awk '$5+0 > 80 {print $0}' | mail -s "Disk Alert" admin@example.com
+Tail a log and filter for errors in real time
+bash
+tail -f /var/log/syslog | grep --line-buffered -E 'ERROR|CRITICAL'
 Parse CSV (simple)
 bash
-awk -F',' '{print $1}' file.csv
-Tail a log and filter errors in real time
-bash
-tail -f app.log | grep --line-buffered "ERROR"
+awk -F',' '{print $1}' data.csv
 Get IP address of a domain
 bash
 dig +short example.com
@@ -280,7 +340,7 @@ $? – Exit status of last command.
 
 exit 0 – Success.
 
-exit 1 – General error.
+exit 1 – General error (or any non-zero value).
 
 set -e – Exit script on any error.
 bash
@@ -294,7 +354,10 @@ set -o pipefail
 set -x – Debug mode (print commands and arguments).
 bash
 set -x
-trap – Catch signals and execute cleanup.
+trap – Execute code on script exit or signal.
 bash
-trap 'echo "Interrupted"; exit' INT
-trap 'rm -f /tmp/tmpfile' EXIT   # cleanup on script exit
+cleanup() {
+  rm -f /tmp/tempfile
+}
+trap cleanup EXIT
+
