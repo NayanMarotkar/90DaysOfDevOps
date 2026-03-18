@@ -1,0 +1,53 @@
+services:
+  flask-app:
+    build: ./app
+    container_name: flask-app
+    ports:
+      - "5000:5000"
+    networks:
+      - my-net
+    labels:
+      tier: "web"
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - MYSQL_DB=testdb
+      - REDIS_HOST=redis
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - my-net
+    labels:
+      tier: "db"
+
+  redis:
+    image: redis:7
+    container_name: redis_cache
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - my-net
+    labels:
+      tier: "cache"
+
+volumes:
+  mysql_data:
+
+networks:
+  my-net:
+    driver: bridge
