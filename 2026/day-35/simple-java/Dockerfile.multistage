@@ -1,0 +1,19 @@
+# stage 1
+FROM eclipse-temurin:17-jdk as builder
+
+WORKDIR /app
+
+COPY . .
+
+RUN javac App.java
+
+
+# stage 2
+FROM gcr.io/distroless/java17-debian11
+
+COPY --from=builder /app/App.class .
+
+EXPOSE 8080
+
+CMD ["App"]
+
