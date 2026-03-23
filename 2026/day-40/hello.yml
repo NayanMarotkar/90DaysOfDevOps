@@ -1,0 +1,31 @@
+---
+name: Hello
+on:
+  push:
+    branches:
+      - main
+jobs:
+  greet:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check repository
+        uses: actions/checkout@v4
+        
+      - name: say hello to users
+        run: echo "Hello from GitHub Actions!"
+
+      - name: print current time and date
+        run: date
+
+      - name: Display branch name
+        run: |
+            echo "The triggering branch is $GITHUB_REF_NAME"
+
+      - name: list the repo files
+        run: ls -la
+
+      - name: runners name
+        run: |
+            echo "Runners name: $RUNNER_OS"
+      #- name: Break the workflow on purpose
+     #   run: exit 1
