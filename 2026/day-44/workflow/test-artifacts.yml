@@ -1,0 +1,32 @@
+name: upload artifact and download artifact
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate-reports:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate report
+        run: |
+          mkdir reports
+          echo "Test run successful" > reports/test-report.txt
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: reports/test-report.txt
+
+  download-reports:
+    runs-on: ubuntu-latest
+    needs: generate-reports
+    steps:
+      - name: download from generate-reports
+        uses: actions/download-artifact@v4
+        with:
+          name: test-report
+          path: reports
+
+      - name: print
+        run: cat reports/test-report.txt
