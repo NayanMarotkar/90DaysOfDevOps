@@ -1,0 +1,40 @@
+name: docker build and push
+on:
+  push:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+    build-and-push:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: code checkout
+              uses: actions/checkout@v6
+            
+            - name: docker hub login
+              uses: docker/login-action@v4
+              with:
+                username: ${{ vars.DOCKERHUB_USERNAME }}
+                password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+            - name: debug username
+              run: echo "username=${{ vars.DOCKERHUB_USERNAME }}"
+
+            - name: build and push to dockerhub
+              uses: docker/build-push-action@v7
+              with:
+                context: .
+                push: true
+                tags: |
+                    ${{vars.DOCKERHUB_USERNAME}}/github-actions-app:${{github.ref_name}}
+                    ${{vars.DOCKERHUB_USERNAME}}/github-actions-app:latest
+                    ${{vars.DOCKERHUB_USERNAME}}/github-actions-app:${{github.sha}}
+
+            # Build only for feature branches and PRs
+           - name: Build image if pushed from other branches or PRs
+             if: github.ref_name != 'main'
+             uses: docker/build-push-action@v6
+             with:
+               context: .
+               push: false
