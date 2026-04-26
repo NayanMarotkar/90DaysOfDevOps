@@ -1,8 +1,8 @@
 name: docker build and push
 on:
-  push:
-  pull_request:
-    types: [opened, synchronize]
+ # push:
+  #pull_request:
+   # types: [opened, synchronize]
 
 jobs:
     build-and-push:
